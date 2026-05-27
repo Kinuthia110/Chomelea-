@@ -1,101 +1,65 @@
-import bcrypt from "bcryptjs";
-
 import User from "../../models/user.js";
+import jwt from "jsonwebtoken";
 
-import generateToken
-from "../../utils/generateToken.js";
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      role: user.role
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "7d"
+    }
+  );
+};
 
 const authResolver = {
-
   Mutation: {
-
-    register: async (_, args) => {
-
-      const existingUser =
-        await User.findOne({
-          email: args.email
-        });
+    register: async (_, { fullName, email, password, phone }) => {
+      const existingUser = await User.findOne({ email });
 
       if (existingUser) {
-        throw new Error(
-          "Email already exists"
-        );
+        throw new Error("User already exists");
       }
 
-      const hashedPassword =
-        await bcrypt.hash(
-          args.password,
-          10
-        );
+      const user = await User.create({
+        fullName,
+        email,
+        password,
+        phone,
+        role: "STAFF"
+      });
 
-      const user =
-        await User.create({
-
-          fullName: args.fullName,
-
-          email: args.email,
-
-          phone: args.phone,
-
-          password: hashedPassword
-
-        });
-
-      const token =
-        generateToken(user);
+      const token = generateToken(user);
 
       return {
         token,
         user
       };
-
     },
 
-
-    login: async (
-      _,
-      { email, password }
-    ) => {
-
-      const user =
-        await User.findOne({
-          email
-        });
+    login: async (_, { email, password }) => {
+      const user = await User.findOne({ email });
 
       if (!user) {
-
-        throw new Error(
-          "Invalid credentials"
-        );
-
+        throw new Error("Invalid email or password");
       }
 
-      const validPassword =
-        await bcrypt.compare(
-          password,
-          user.password
-        );
+      const isMatch = await user.comparePassword(password);
 
-      if (!validPassword) {
-
-        throw new Error(
-          "Invalid credentials"
-        );
-
+      if (!isMatch) {
+        throw new Error("Invalid email or password");
       }
 
-      const token =
-        generateToken(user);
+      const token = generateToken(user);
 
       return {
         token,
         user
       };
-
     }
-
   }
-
 };
 
 export default authResolver;
