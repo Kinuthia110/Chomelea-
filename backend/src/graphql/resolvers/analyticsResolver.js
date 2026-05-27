@@ -1,5 +1,5 @@
 import Customer from "../../models/Customer.js";
-import Project from "../../models/Project.JS";
+import Project from "../../models/Project.js";
 import Quotation from "../../models/Quotation.js";
 import Invoice from "../../models/Invoice.js";
 import Payment from "../../models/Payment.js";
