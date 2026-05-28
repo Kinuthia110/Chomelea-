@@ -23,12 +23,18 @@ const PORT = process.env.PORT || 5000;
 
 await connectDB();
 
+
 app.use(
   cors({
-    origin: "*",
+    origin: [
+      "http://localhost:5173",
+      "https://chomelea-5c0yqodto-kinuthia110s-projects.vercel.app"
+    ],
     credentials: true
   })
 );
+  
+
 
 app.use(express.json());
 
