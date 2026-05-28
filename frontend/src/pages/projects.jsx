@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
-import Sidebar from "../components/Sidebar.jsx";
+import Sidebar from "../components/sidebar.jsx";
 
 const GET_PROJECTS = gql`
   query {

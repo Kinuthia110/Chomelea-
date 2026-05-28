@@ -23,7 +23,7 @@ import {
   FaSignOutAlt
 } from "react-icons/fa";
 
-import Sidebar from "../components/Sidebar.jsx";
+import Sidebar from "../components/sidebar.jsx";
 
 const DASHBOARD_QUERY = gql`
   query {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar.jsx";
+import Sidebar from "../components/sidebar.jsx";
 
 const themes = {
   orange: {
