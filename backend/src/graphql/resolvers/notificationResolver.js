@@ -1,6 +1,6 @@
-import Invoice from "../../models/Invoice.js";
-import Inventory from "../../models/Inventory.js";
-import Project from "../../models/Project.js";
+import Invoice from "../../models/invoice.js";
+import Inventory from "../../models/inventory.js";
+import Project from "../../models/project.js";
 import auth from "../../middleware/auth.js";
 
 const notificationResolver = {

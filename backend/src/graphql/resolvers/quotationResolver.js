@@ -1,5 +1,5 @@
-import Quotation from "../../models/Quotation.js";
-import Customer from "../../models/Customer.js";
+import Quotation from "../../models/quotation.js";
+import Customer from "../../models/customer.js";
 import auth from "../../middleware/auth.js";
 import authorize from "../../middleware/roles.js";
 import generateQuotationPDF from "../../utils/generateQuotationPDF.js";

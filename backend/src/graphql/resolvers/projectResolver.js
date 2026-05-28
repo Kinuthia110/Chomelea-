@@ -1,5 +1,5 @@
-import Project from "../../models/Project.JS";
-import Customer from "../../models/Customer.js";
+import Project from "../../models/project.js";
+import Customer from "../../models/customer.js";
 import auth from "../../middleware/auth.js";
 import authorize from "../../middleware/roles.js";
 

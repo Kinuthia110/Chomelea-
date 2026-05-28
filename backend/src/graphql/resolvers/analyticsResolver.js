@@ -1,9 +1,9 @@
-import Customer from "../../models/Customer.js";
-import Project from "../../models/Project.js";
-import Quotation from "../../models/Quotation.js";
-import Invoice from "../../models/Invoice.js";
-import Payment from "../../models/Payment.js";
-import Inventory from "../../models/Inventory.js";
+import Customer from "../../models/customer.js";
+import Project from "../../models/project.js";
+import Quotation from "../../models/quotation.js";
+import Invoice from "../../models/invoice.js";
+import Payment from "../../models/payment.js";
+import Inventory from "../../models/inventory.js";
 import auth from "../../middleware/auth.js";
 
 const analyticsResolver = {

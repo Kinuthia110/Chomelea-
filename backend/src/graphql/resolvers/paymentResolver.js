@@ -1,6 +1,6 @@
-import Payment from "../../models/Payment.js";
-import Invoice from "../../models/Invoice.js";
-import Customer from "../../models/Customer.js";
+import Payment from "../../models/payment.js";
+import Invoice from "../../models/invoice.js";
+import Customer from "../../models/customer.js";
 import auth from "../../middleware/auth.js";
 import authorize from "../../middleware/roles.js";
 

@@ -1,4 +1,4 @@
-import Customer from "../../models/Customer.js";
+import Customer from "../../models/customer.js";
 import auth from "../../middleware/auth.js";
 import authorize from "../../middleware/roles.js";
 

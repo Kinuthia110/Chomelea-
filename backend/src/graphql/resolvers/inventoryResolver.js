@@ -1,5 +1,5 @@
-import Inventory from "../../models/Inventory.js";
-import StockMovement from "../../models/StockMovement.js";
+import Inventory from "../../models/inventory.js";
+import StockMovement from "../../models/stockMovement.js";
 import auth from "../../middleware/auth.js";
 import authorize from "../../middleware/roles.js";
 
