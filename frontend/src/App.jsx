@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Dashboard from "./pages/Dashboard.jsx";
-import Customers from "./pages/Customers.jsx";
-import Projects from "./pages/Projects.jsx";
-import Quotations from "./pages/Quotations.jsx";
-import Invoices from "./pages/Invoices.jsx";
-import Payments from "./pages/Payments.jsx";
-import Inventory from "./pages/Inventory.jsx";
-import Reports from "./pages/Reports.jsx";
-import Settings from "./pages/Settings.jsx";
-import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/dashboard.jsx";
+import Customers from "./pages/customers.jsx";
+import Projects from "./pages/projects.jsx";
+import Quotations from "./pages/quotations.jsx";
+import Invoices from "./pages/invoices.jsx";
+import Payments from "./pages/payments.jsx";
+import Inventory from "./pages/inventory.jsx";
+import Reports from "./pages/reports.jsx";
+import Settings from "./pages/settings.jsx";
+import Login from "./pages/login.jsx";
 import FileUploads from "./pages/FileUploads.jsx";
 import Notifications from "./pages/Notifications.jsx";
 
