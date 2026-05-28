@@ -23,18 +23,30 @@ const PORT = process.env.PORT || 5000;
 
 await connectDB();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://chomelea.vercel.app"
+];
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://chomelea-5c0yqodto-kinuthia110s-projects.vercel.app"
-    ],
+    origin: function (origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true
   })
 );
-  
-
 
 app.use(express.json());
 
