@@ -24,8 +24,7 @@ const PORT = process.env.PORT || 5000;
 await connectDB();
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://chomelea.vercel.app"
+  "http://localhost:5173"
 ];
 
 app.use(
@@ -47,6 +46,8 @@ app.use(
     credentials: true
   })
 );
+
+app.options("*", cors());
 
 app.use(express.json());
 
