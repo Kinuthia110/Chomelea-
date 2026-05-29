@@ -33,6 +33,19 @@ type ProjectStatusCount {
   count: Int
 }
 
+type TopCustomer {
+  customerName: String
+  totalSpent: Float
+  invoiceCount: Int
+}
+
+type LowStockItem {
+  itemName: String
+  quantity: Float
+  unit: String
+  minimumStockLevel: Float
+}
+
 type RecentActivity {
   type: String
   title: String
@@ -40,12 +53,48 @@ type RecentActivity {
   createdAt: String
 }
 
+type KpiGrowth {
+  revenueGrowth: Float
+  invoiceGrowth: Float
+  paymentGrowth: Float
+  outstandingGrowth: Float
+  currentRevenue: Float
+  previousRevenue: Float
+  currentInvoiceValue: Float
+  previousInvoiceValue: Float
+  currentPayments: Float
+  previousPayments: Float
+  currentOutstanding: Float
+  previousOutstanding: Float
+}
+
+type RevenueForecast {
+  nextMonthForecast: Float
+  averageMonthlyRevenue: Float
+  bestMonthRevenue: Float
+  worstMonthRevenue: Float
+}
+
+type AnalyticsReport {
+  totalRevenue: Float
+  totalInvoices: Int
+  totalPayments: Int
+  outstandingBalance: Float
+  lowStockCount: Int
+  generatedAt: String
+}
+
 type Query {
   revenueSummary: RevenueSummary
   dashboardStats: DashboardStats
   monthlyRevenue: [MonthlyRevenue]
   projectStatusCounts: [ProjectStatusCount]
+  topCustomers: [TopCustomer]
+  lowStockItems: [LowStockItem]
   recentActivities: [RecentActivity]
+  kpiGrowth: KpiGrowth
+  revenueForecast: RevenueForecast
+  analyticsReport: AnalyticsReport
 }
 
 `;
