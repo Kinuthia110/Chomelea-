@@ -9,7 +9,6 @@ import typeDefs from "./graphql/typeDefs/index.js";
 import resolvers from "./graphql/resolvers/index.js";
 
 import uploadRoutes from "./routes/uploadRoutes.js";
-import mpesaRoutes from "./routes/mpesaRoutes.js";
 
 dotenv.config();
 
@@ -50,7 +49,7 @@ app.use(
 );
 
 app.use("/api/uploads", uploadRoutes);
-app.use("/api/mpesa", mpesaRoutes);
+
 
 const server = new ApolloServer({
   typeDefs,
