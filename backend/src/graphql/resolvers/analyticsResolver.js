@@ -22,17 +22,9 @@ const analyticsResolver = {
         }
       ]);
 
-      const paidInvoices = await Invoice.countDocuments({
-        paymentStatus: "PAID"
-      });
-
-      const partialInvoices = await Invoice.countDocuments({
-        paymentStatus: "PARTIAL"
-      });
-
-      const unpaidInvoices = await Invoice.countDocuments({
-        paymentStatus: "UNPAID"
-      });
+      const paidInvoices = await Invoice.countDocuments({ paymentStatus: "PAID" });
+      const partialInvoices = await Invoice.countDocuments({ paymentStatus: "PARTIAL" });
+      const unpaidInvoices = await Invoice.countDocuments({ paymentStatus: "UNPAID" });
 
       return {
         totalInvoiceValue: totals[0]?.totalInvoiceValue || 0,
@@ -49,28 +41,15 @@ const analyticsResolver = {
 
       const totalCustomers = await Customer.countDocuments();
       const totalProjects = await Project.countDocuments();
-
-      const activeProjects = await Project.countDocuments({
-        status: { $ne: "COMPLETED" }
-      });
-
-      const completedProjects = await Project.countDocuments({
-        status: "COMPLETED"
-      });
-
+      const activeProjects = await Project.countDocuments({ status: { $ne: "COMPLETED" } });
+      const completedProjects = await Project.countDocuments({ status: "COMPLETED" });
       const totalQuotations = await Quotation.countDocuments();
-
-      const approvedQuotations = await Quotation.countDocuments({
-        status: "APPROVED"
-      });
-
+      const approvedQuotations = await Quotation.countDocuments({ status: "APPROVED" });
       const totalInvoices = await Invoice.countDocuments();
       const totalPayments = await Payment.countDocuments();
 
       const lowStockCount = await Inventory.countDocuments({
-        $expr: {
-          $lte: ["$quantity", "$minimumStockLevel"]
-        }
+        $expr: { $lte: ["$quantity", "$minimumStockLevel"] }
       });
 
       return {
@@ -101,12 +80,7 @@ const analyticsResolver = {
             outstandingBalance: { $sum: "$balance" }
           }
         },
-        {
-          $sort: {
-            "_id.year": 1,
-            "_id.month": 1
-          }
-        }
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
       ]);
 
       return result.map((item) => ({
@@ -127,16 +101,60 @@ const analyticsResolver = {
             count: { $sum: 1 }
           }
         },
-        {
-          $sort: {
-            count: -1
-          }
-        }
+        { $sort: { count: -1 } }
       ]);
 
       return result.map((item) => ({
         status: item._id || "UNKNOWN",
         count: item.count
+      }));
+    },
+
+    topCustomers: async (_, args, { req }) => {
+      await auth(req);
+
+      const result = await Invoice.aggregate([
+        {
+          $group: {
+            _id: "$customer",
+            totalSpent: { $sum: "$amountPaid" },
+            invoiceCount: { $sum: 1 }
+          }
+        },
+        { $sort: { totalSpent: -1 } },
+        { $limit: 5 },
+        {
+          $lookup: {
+            from: "customers",
+            localField: "_id",
+            foreignField: "_id",
+            as: "customer"
+          }
+        },
+        { $unwind: { path: "$customer", preserveNullAndEmptyArrays: true } }
+      ]);
+
+      return result.map((item) => ({
+        customerName: item.customer?.fullName || "Unknown Customer",
+        totalSpent: item.totalSpent || 0,
+        invoiceCount: item.invoiceCount || 0
+      }));
+    },
+
+    lowStockItems: async (_, args, { req }) => {
+      await auth(req);
+
+      const items = await Inventory.find({
+        $expr: { $lte: ["$quantity", "$minimumStockLevel"] }
+      })
+        .sort({ quantity: 1 })
+        .limit(8);
+
+      return items.map((item) => ({
+        itemName: item.itemName,
+        quantity: item.quantity,
+        unit: item.unit,
+        minimumStockLevel: item.minimumStockLevel
       }));
     },
 
@@ -168,8 +186,8 @@ const analyticsResolver = {
 
         ...recentPayments.map((payment) => ({
           type: "PAYMENT",
-          title: `Payment ${payment.paymentNumber || ""}`,
-          description: `KES ${payment.amount} received from ${
+          title: payment.paymentNumber || "Payment received",
+          description: `KES ${payment.amount || 0} received from ${
             payment.customer?.fullName || "customer"
           }`,
           createdAt: payment.createdAt
@@ -177,7 +195,7 @@ const analyticsResolver = {
 
         ...recentInvoices.map((invoice) => ({
           type: "INVOICE",
-          title: invoice.invoiceNumber,
+          title: invoice.invoiceNumber || "Invoice created",
           description: `Invoice for ${invoice.customer?.fullName || "customer"}`,
           createdAt: invoice.createdAt
         }))
