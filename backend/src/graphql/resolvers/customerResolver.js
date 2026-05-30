@@ -1,21 +1,25 @@
 import Customer from "../../models/customer.js";
-import auth from "../../middleware/auth.js";
-import authorize from "../../middleware/roles.js";
+
+import auth, {
+  requireAdmin,
+  requireManagerOrAdmin,
+  requireStaffOrAbove
+} from "../../middleware/auth.js";
 
 const customerResolver = {
   Query: {
     customers: async (_, args, { req }) => {
-      await auth(req);
+      const user = await auth(req);
+      requireStaffOrAbove(user);
 
-      return await Customer.find()
-        .populate("createdBy")
-        .sort({ createdAt: -1 });
+      return Customer.find().sort({ createdAt: -1 });
     },
 
     customer: async (_, { id }, { req }) => {
-      await auth(req);
+      const user = await auth(req);
+      requireStaffOrAbove(user);
 
-      const customer = await Customer.findById(id).populate("createdBy");
+      const customer = await Customer.findById(id);
 
       if (!customer) {
         throw new Error("Customer not found");
@@ -26,32 +30,64 @@ const customerResolver = {
   },
 
   Mutation: {
-    createCustomer: async (_, args, { req }) => {
+    createCustomer: async (
+      _,
+      {
+        fullName,
+        phone,
+        email,
+        address,
+        companyName,
+        notes
+      },
+      { req }
+    ) => {
       const user = await auth(req);
-
-      authorize("ADMIN", "MANAGER")(user);
+      requireManagerOrAdmin(user);
 
       const customer = await Customer.create({
-        ...args,
-        createdBy: user._id
+        fullName,
+        phone,
+        email,
+        address,
+        companyName,
+        notes
       });
 
-      return customer.populate("createdBy");
+      return customer;
     },
 
-    updateCustomer: async (_, { id, ...updates }, { req }) => {
+    updateCustomer: async (
+      _,
+      {
+        id,
+        fullName,
+        phone,
+        email,
+        address,
+        companyName,
+        notes
+      },
+      { req }
+    ) => {
       const user = await auth(req);
-
-      authorize("ADMIN", "MANAGER")(user);
+      requireManagerOrAdmin(user);
 
       const customer = await Customer.findByIdAndUpdate(
         id,
-        updates,
+        {
+          fullName,
+          phone,
+          email,
+          address,
+          companyName,
+          notes
+        },
         {
           new: true,
           runValidators: true
         }
-      ).populate("createdBy");
+      );
 
       if (!customer) {
         throw new Error("Customer not found");
@@ -62,8 +98,7 @@ const customerResolver = {
 
     deleteCustomer: async (_, { id }, { req }) => {
       const user = await auth(req);
-
-      authorize("ADMIN")(user);
+      requireAdmin(user);
 
       const customer = await Customer.findByIdAndDelete(id);
 
@@ -71,7 +106,7 @@ const customerResolver = {
         throw new Error("Customer not found");
       }
 
-      return "Customer deleted successfully";
+      return true;
     }
   }
 };
