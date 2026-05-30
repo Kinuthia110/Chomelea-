@@ -1,33 +1,30 @@
 import Quotation from "../../models/quotation.js";
-import Customer from "../../models/customer.js";
-import auth from "../../middleware/auth.js";
-import authorize from "../../middleware/roles.js";
-import generateQuotationPDF from "../../utils/generateQuotationPDF.js";
 
-const generateQuotationNumber = () => {
-  const random = Math.floor(1000 + Math.random() * 9000);
-  return `QT-${Date.now()}-${random}`;
-};
+import auth, {
+  requireAdmin,
+  requireManagerOrAdmin,
+  requireStaffOrAbove
+} from "../../middleware/auth.js";
 
 const quotationResolver = {
   Query: {
     quotations: async (_, args, { req }) => {
-      await auth(req);
+      const user = await auth(req);
+      requireStaffOrAbove(user);
 
-      return await Quotation.find()
+      return Quotation.find()
         .populate("customer")
         .populate("project")
-        .populate("createdBy")
         .sort({ createdAt: -1 });
     },
 
     quotation: async (_, { id }, { req }) => {
-      await auth(req);
+      const user = await auth(req);
+      requireStaffOrAbove(user);
 
       const quotation = await Quotation.findById(id)
         .populate("customer")
-        .populate("project")
-        .populate("createdBy");
+        .populate("project");
 
       if (!quotation) {
         throw new Error("Quotation not found");
@@ -40,66 +37,27 @@ const quotationResolver = {
   Mutation: {
     createQuotation: async (_, args, { req }) => {
       const user = await auth(req);
+      requireManagerOrAdmin(user);
 
-      authorize("ADMIN", "MANAGER")(user);
+      const quotation = await Quotation.create(args);
 
-      const customer = await Customer.findById(args.customer);
-
-      if (!customer) {
-        throw new Error("Customer not found");
-      }
-
-      const items = args.items.map((item) => ({
-        itemName: item.itemName,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        total: item.quantity * item.unitPrice
-      }));
-
-      const itemsTotal = items.reduce((sum, item) => sum + item.total, 0);
-
-      const laborCost = args.laborCost || 0;
-      const transportCost = args.transportCost || 0;
-      const tax = args.tax || 0;
-
-      const subtotal = itemsTotal + laborCost + transportCost;
-      const grandTotal = subtotal + tax;
-
-      const quotation = await Quotation.create({
-        customer: args.customer,
-        quotationNumber: generateQuotationNumber(),
-        items,
-        laborCost,
-        transportCost,
-        subtotal,
-        tax,
-        grandTotal,
-        notes: args.notes,
-        createdBy: user._id
-      });
-
-      return await Quotation.findById(quotation._id)
-        .populate("customer")
-        .populate("project")
-        .populate("createdBy");
+      return quotation.populate(["customer", "project"]);
     },
 
-    updateQuotationStatus: async (_, { id, status }, { req }) => {
+    updateQuotation: async (_, { id, ...updates }, { req }) => {
       const user = await auth(req);
-
-      authorize("ADMIN", "MANAGER")(user);
+      requireManagerOrAdmin(user);
 
       const quotation = await Quotation.findByIdAndUpdate(
         id,
-        { status },
+        updates,
         {
           new: true,
           runValidators: true
         }
       )
         .populate("customer")
-        .populate("project")
-        .populate("createdBy");
+        .populate("project");
 
       if (!quotation) {
         throw new Error("Quotation not found");
@@ -108,29 +66,47 @@ const quotationResolver = {
       return quotation;
     },
 
-    generateQuotationPDF: async (_, { id }, { req }) => {
+    approveQuotation: async (_, { id }, { req }) => {
       const user = await auth(req);
+      requireManagerOrAdmin(user);
 
-      authorize("ADMIN", "MANAGER")(user);
-
-      const quotation = await Quotation.findById(id)
+      const quotation = await Quotation.findByIdAndUpdate(
+        id,
+        { status: "APPROVED" },
+        { new: true, runValidators: true }
+      )
         .populate("customer")
-        .populate("project")
-        .populate("createdBy");
+        .populate("project");
 
       if (!quotation) {
         throw new Error("Quotation not found");
       }
 
-      const pdfUrl = await generateQuotationPDF(quotation);
+      return quotation;
+    },
 
-      return pdfUrl;
+    rejectQuotation: async (_, { id }, { req }) => {
+      const user = await auth(req);
+      requireManagerOrAdmin(user);
+
+      const quotation = await Quotation.findByIdAndUpdate(
+        id,
+        { status: "REJECTED" },
+        { new: true, runValidators: true }
+      )
+        .populate("customer")
+        .populate("project");
+
+      if (!quotation) {
+        throw new Error("Quotation not found");
+      }
+
+      return quotation;
     },
 
     deleteQuotation: async (_, { id }, { req }) => {
       const user = await auth(req);
-
-      authorize("ADMIN")(user);
+      requireAdmin(user);
 
       const quotation = await Quotation.findByIdAndDelete(id);
 
@@ -138,7 +114,7 @@ const quotationResolver = {
         throw new Error("Quotation not found");
       }
 
-      return "Quotation deleted successfully";
+      return true;
     }
   }
 };
