@@ -1,135 +1,84 @@
-import generateInvoicePDF from "../../utils/generateInvoicePDF.js";
-const invoiceType = `#graphql
+import Invoice from "../../models/invoice.js";
 
-type InvoiceItem {
+import auth, {
+  requireAdmin,
+  requireManagerOrAdmin,
+  requireStaffOrAbove
+} from "../../middleware/auth.js";
 
-  itemName: String
+const invoiceResolver = {
+  Query: {
+    invoices: async (_, args, { req }) => {
+      const user = await auth(req);
+      requireStaffOrAbove(user);
 
-  quantity: Float
+      return Invoice.find()
+        .populate("customer")
+        .populate("project")
+        .sort({ createdAt: -1 });
+    },
 
-  unitPrice: Float
+    invoice: async (_, { id }, { req }) => {
+      const user = await auth(req);
+      requireStaffOrAbove(user);
 
-  total: Float
+      const invoice = await Invoice.findById(id)
+        .populate("customer")
+        .populate("project");
 
-}
+      if (!invoice) {
+        throw new Error("Invoice not found");
+      }
 
-input InvoiceItemInput {
+      return invoice;
+    }
+  },
 
-  itemName: String!
+  Mutation: {
+    createInvoice: async (_, args, { req }) => {
+      const user = await auth(req);
+      requireManagerOrAdmin(user);
 
-  quantity: Float!
+      const invoice = await Invoice.create(args);
 
-  unitPrice: Float!
+      return invoice.populate(["customer", "project"]);
+    },
 
-}
+    updateInvoice: async (_, { id, ...updates }, { req }) => {
+      const user = await auth(req);
+      requireManagerOrAdmin(user);
 
-type Invoice {
+      const invoice = await Invoice.findByIdAndUpdate(
+        id,
+        updates,
+        {
+          new: true,
+          runValidators: true
+        }
+      )
+        .populate("customer")
+        .populate("project");
 
-  id: ID!
+      if (!invoice) {
+        throw new Error("Invoice not found");
+      }
 
-  invoiceNumber: String
+      return invoice;
+    },
 
-  customer: Customer
+    deleteInvoice: async (_, { id }, { req }) => {
+      const user = await auth(req);
+      requireAdmin(user);
 
-  project: Project
+      const invoice = await Invoice.findByIdAndDelete(id);
 
-  quotation: Quotation
+      if (!invoice) {
+        throw new Error("Invoice not found");
+      }
 
-  items: [InvoiceItem]
-
-  subtotal: Float
-
-  tax: Float
-
-  grandTotal: Float
-
-  amountPaid: Float
-
-  balance: Float
-
-  paymentStatus: String
-
-  invoiceStatus: String
-
-  dueDate: String
-
-  notes: String
-
-  createdBy: User
-
-  createdAt: String
-
-}
-
-type Query {
-
-  invoices: [Invoice]
-
-  invoice(id: ID!): Invoice
-
-}
-
-type Mutation {
-
-  createInvoice(
-
-    customer: ID!
-
-    quotation: ID
-
-    project: ID
-
-    items: [InvoiceItemInput!]!
-
-    tax: Float
-
-    dueDate: String
-
-    notes: String
-
-  ): Invoice
-
-
-  recordInvoicePayment(
-
-    id: ID!
-
-    amount: Float!
-
-  ): Invoice
-
-
-  updateInvoiceStatus(
-
-    id: ID!
-
-    status: String!
-
-  ): Invoice
-
-generateInvoicePDF: async (_, { id }, { req }) => {
-  const user = await auth(req);
-
-  authorize("ADMIN", "MANAGER")(user);
-
-  const invoice = await Invoice.findById(id)
-    .populate("customer")
-    .populate("project")
-    .populate("quotation")
-    .populate("createdBy");
-
-  if (!invoice) {
-    throw new Error("Invoice not found");
+      return true;
+    }
   }
+};
 
-  const pdfUrl = await generateInvoicePDF(invoice);
-
-  return pdfUrl;
-},
-  deleteInvoice(id: ID!): String
-
-}
-
-`;
-
-export default invoiceType;
+export default invoiceResolver;
