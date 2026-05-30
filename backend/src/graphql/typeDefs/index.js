@@ -11,7 +11,7 @@ import paymentType from "./payment.js";
 import inventoryType from "./inventory.js";
 import analyticsType from "./analytics.js";
 import notificationType from "./notification.js";
-import userType from "./user.js";
+
 const typeDefs = [
   testType,
   userType,
@@ -26,7 +26,7 @@ const typeDefs = [
   inventoryType,
   analyticsType,
   notificationType,
-  userType
+  
 ];
 
 export default typeDefs;
