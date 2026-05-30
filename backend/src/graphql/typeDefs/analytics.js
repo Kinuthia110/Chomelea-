@@ -39,7 +39,7 @@ type TopCustomer {
   invoiceCount: Int
 }
 
-type LowStockItem {
+type DashboardLowStockItem {
   itemName: String
   quantity: Float
   unit: String
@@ -90,7 +90,7 @@ type Query {
   monthlyRevenue: [MonthlyRevenue]
   projectStatusCounts: [ProjectStatusCount]
   topCustomers: [TopCustomer]
-  lowStockItems: [LowStockItem]
+  dashboardLowStockItems: [DashboardLowStockItem]
   recentActivities: [RecentActivity]
   kpiGrowth: KpiGrowth
   revenueForecast: RevenueForecast

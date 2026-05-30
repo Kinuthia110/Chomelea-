@@ -208,7 +208,7 @@ const analyticsResolver = {
       }));
     },
 
-    lowStockItems: async (_, args, { req }) => {
+    dashboardLowStockItems: async (_, args, { req }) => {
       await auth(req);
 
       const items = await Inventory.find({

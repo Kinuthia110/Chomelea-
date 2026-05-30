@@ -70,13 +70,12 @@ const DASHBOARD_QUERY = gql`
       totalSpent
       invoiceCount
     }
-
-    lowStockItems {
-      itemName
+    dashboardLowStockItems {
+    itemName
       quantity
       unit
       minimumStockLevel
-    }
+   }
 
     kpiGrowth {
       revenueGrowth
@@ -193,10 +192,10 @@ function Dashboard() {
   const topCustomers = Array.isArray(data?.topCustomers)
     ? data.topCustomers
     : [];
-
-  const lowStockItems = Array.isArray(data?.lowStockItems)
-    ? data.lowStockItems
-    : [];
+   const lowStockItems = Array.isArray(data?.dashboardLowStockItems)
+  ? data.dashboardLowStockItems
+  : [];
+  
 
   const activities = Array.isArray(data?.recentActivities)
     ? data.recentActivities
