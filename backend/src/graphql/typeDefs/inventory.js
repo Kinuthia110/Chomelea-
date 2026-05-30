@@ -72,6 +72,8 @@ type Mutation {
     notes: String
   ): StockMovement
 
+  deleteStockMovement(id: ID!): Boolean
+
   deleteInventoryItem(id: ID!): Boolean
 }
 
