@@ -1,31 +1,68 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  createHttpLink
-} from "@apollo/client";
+const analyticsType = `#graphql
 
-import { setContext } from "@apollo/client/link/context";
+type RevenueSummary {
+  totalInvoiceValue: Float
+  totalRevenueReceived: Float
+  outstandingBalance: Float
+  paidInvoices: Int
+  partialInvoices: Int
+  unpaidInvoices: Int
+}
 
-const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_API_URL
-});
+type DashboardStats {
+  totalCustomers: Int
+  totalProjects: Int
+  activeProjects: Int
+  completedProjects: Int
+  totalQuotations: Int
+  approvedQuotations: Int
+  totalInvoices: Int
+  totalPayments: Int
+  lowStockCount: Int
+}
 
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem("token");
+type MonthlyRevenue {
+  month: String
+  invoiceValue: Float
+  revenueReceived: Float
+  outstandingBalance: Float
+}
 
-  console.log("TOKEN SENT:", token);
+type ProjectStatusCount {
+  status: String
+  count: Int
+}
 
-  return {
-    headers: {
-      ...headers,
-      Authorization: token ? `Bearer ${token}` : ""
-    }
-  };
-});
+type TopCustomer {
+  customerName: String
+  totalSpent: Float
+  invoiceCount: Int
+}
 
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache()
-});
+type LowStockItem {
+  itemName: String
+  quantity: Float
+  unit: String
+  minimumStockLevel: Float
+}
 
-export default client;
+type RecentActivity {
+  type: String
+  title: String
+  description: String
+  createdAt: String
+}
+
+type Query {
+  revenueSummary: RevenueSummary
+  dashboardStats: DashboardStats
+  monthlyRevenue: [MonthlyRevenue]
+  projectStatusCounts: [ProjectStatusCount]
+  topCustomers: [TopCustomer]
+  lowStockItems: [LowStockItem]
+  recentActivities: [RecentActivity]
+}
+
+`;
+
+export default analyticsType;
