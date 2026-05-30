@@ -10,6 +10,7 @@ import paymentResolver from "./paymentResolver.js";
 import inventoryResolver from "./inventoryResolver.js";
 import analyticsResolver from "./analyticsResolver.js";
 import notificationResolver from "./notificationResolver.js";
+import userResolver from "./userResolver.js";
 
 const resolvers = [
   testResolver,
@@ -23,7 +24,8 @@ const resolvers = [
   paymentResolver,
   inventoryResolver,
   analyticsResolver,
-  notificationResolver
+  notificationResolver,
+  userResolver
 ];
 
 export default resolvers;
