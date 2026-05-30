@@ -50,19 +50,20 @@ type Mutation {
     notes: String
   ): Invoice
 
-  recordInvoicePayment(
+  updateInvoice(
     id: ID!
-    amount: Float!
+    customer: ID
+    quotation: ID
+    project: ID
+    items: [InvoiceItemInput!]
+    tax: Float
+    dueDate: String
+    notes: String
+    paymentStatus: String
+    invoiceStatus: String
   ): Invoice
 
-  updateInvoiceStatus(
-    id: ID!
-    status: String!
-  ): Invoice
-
-  generateInvoicePDF(id: ID!): String
-
-  deleteInvoice(id: ID!): String
+  deleteInvoice(id: ID!): Boolean
 }
 
 `;

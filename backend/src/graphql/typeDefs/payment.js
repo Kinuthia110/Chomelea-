@@ -23,7 +23,7 @@ type Query {
 }
 
 type Mutation {
-  recordPayment(
+  createPayment(
     customer: ID!
     invoice: ID
     project: ID
@@ -33,7 +33,18 @@ type Mutation {
     notes: String
   ): Payment
 
-  deletePayment(id: ID!): String
+  updatePayment(
+    id: ID!
+    customer: ID
+    invoice: ID
+    project: ID
+    amount: Float
+    paymentMethod: String
+    transactionCode: String
+    notes: String
+  ): Payment
+
+  deletePayment(id: ID!): Boolean
 }
 
 `;

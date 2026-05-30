@@ -63,22 +63,16 @@ type Mutation {
     notes: String
   ): Inventory
 
-  stockIn(
+  addStockMovement(
     inventoryItem: ID!
-    quantity: Float!
-    reason: String
-    notes: String
-  ): Inventory
-
-  stockOut(
-    inventoryItem: ID!
+    type: String!
     quantity: Float!
     reason: String
     project: ID
     notes: String
-  ): Inventory
+  ): StockMovement
 
-  deleteInventoryItem(id: ID!): String
+  deleteInventoryItem(id: ID!): Boolean
 }
 
 `;

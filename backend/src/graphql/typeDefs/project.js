@@ -38,43 +38,26 @@ type Mutation {
     customer: ID!
     projectTitle: String!
     description: String
-    category: String
-    width: Float
-    height: Float
-    unit: String
-    totalCost: Float
-    depositPaid: Float
+    location: String
     startDate: String
-    deadline: String
+    endDate: String
+    status: String
+    budget: Float
   ): Project
 
   updateProject(
     id: ID!
+    customer: ID
     projectTitle: String
     description: String
-    category: String
-    status: String
-    width: Float
-    height: Float
-    unit: String
-    totalCost: Float
-    depositPaid: Float
+    location: String
     startDate: String
-    deadline: String
-    completionDate: String
+    endDate: String
+    status: String
+    budget: Float
   ): Project
 
-  updateProjectStatus(
-    id: ID!
-    status: String!
-  ): Project
-
-  assignWorkersToProject(
-    id: ID!
-    workerIds: [ID!]!
-  ): Project
-
-  deleteProject(id: ID!): String
+  deleteProject(id: ID!): Boolean
 }
 
 `;

@@ -5,7 +5,8 @@ type Customer {
   fullName: String!
   phone: String!
   email: String
-  location: String
+  address: String
+  companyName: String
   notes: String
   createdBy: User
   createdAt: String
@@ -22,7 +23,8 @@ type Mutation {
     fullName: String!
     phone: String!
     email: String
-    location: String
+    address: String
+    companyName: String
     notes: String
   ): Customer
 
@@ -31,11 +33,12 @@ type Mutation {
     fullName: String
     phone: String
     email: String
-    location: String
+    address: String
+    companyName: String
     notes: String
   ): Customer
 
-  deleteCustomer(id: ID!): String
+  deleteCustomer(id: ID!): Boolean
 }
 
 `;

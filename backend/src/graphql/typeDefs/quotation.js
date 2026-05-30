@@ -46,14 +46,22 @@ type Mutation {
     notes: String
   ): Quotation
 
-  updateQuotationStatus(
+  updateQuotation(
     id: ID!
-    status: String!
+    customer: ID
+    items: [QuotationItemInput!]
+    laborCost: Float
+    transportCost: Float
+    tax: Float
+    notes: String
+    status: String
   ): Quotation
 
-  generateQuotationPDF(id: ID!): String
+  approveQuotation(id: ID!): Quotation
 
-  deleteQuotation(id: ID!): String
+  rejectQuotation(id: ID!): Quotation
+
+  deleteQuotation(id: ID!): Boolean
 }
 
 `;
